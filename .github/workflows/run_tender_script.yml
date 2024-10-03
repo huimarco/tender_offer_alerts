@@ -37,3 +37,6 @@ jobs:
       # Step 5: Run the Python script
       - name: Run the script
         run: python main.py
+        env:
+          API_IDENTITY: ${{ secrets.API_IDENTITY }}   # Pass secret as environment variable
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}   # Pass secret as environment variable
