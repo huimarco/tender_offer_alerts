@@ -12,8 +12,14 @@ def get_tenders(my_identity):
     # retrieve filings (can specify a year; must include quarter if current year)
     filings = get_filings()
 
+    print('2024 filings retrieved')
+    print(filings)
+
     # filter for tender offer related forms (including ammendments)
     tenders = filings.filter(form=['SC TO-I', 'SC TO-C', 'SC 13E-3', 'SC 13E-4'], amendments=True)
+
+    print('2024 TO filings retrieved')
+    print(tenders)
 
     # return results as pandas dataframe
     return tenders.to_pandas()
