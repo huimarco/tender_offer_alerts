@@ -12,14 +12,8 @@ def get_tenders(my_identity):
     # retrieve filings (can specify a year; must include quarter if current year)
     filings = get_filings()
 
-    print('2024 filings retrieved')
-    print(filings)
-
     # filter for tender offer related forms (including ammendments)
     tenders = filings.filter(form=['SC TO-I', 'SC TO-C', 'SC 13E-3', 'SC 13E-4'], amendments=True)
-
-    print('2024 TO filings retrieved')
-    print(tenders)
 
     # return results as pandas dataframe
     return tenders.to_pandas()
@@ -35,6 +29,12 @@ def get_yesterday_tenders(my_identity):
 
   # filter for tender offer forms filed yesterday and return
   tenders_df = get_tenders(my_identity)
+
+  # Break if the filing_date is missing
+  if 'filing_date' not in tenders_df.columns:
+      print("Error: 'filing_date' column not found in DataFrame")
+      return
+  
   new_to = tenders_df[tenders_df['filing_date']==yesterday]
   return new_to
 
@@ -63,9 +63,6 @@ print('Running script on', date.today())
 # define variables
 my_identity = os.getenv('API_IDENTITY')
 teams_webhook_url = os.getenv('TEAMS_WEBHOOK_URL')
-
-print(my_identity)
-print(teams_webhook_url)
 
 # retrieve tender offer filings from yesterday
 yesterday_tenders = get_yesterday_tenders(my_identity)
