@@ -1,0 +1,3 @@
+pandas
+edgartools
+requests
