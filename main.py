@@ -64,6 +64,9 @@ print('Running script on', date.today())
 my_identity = os.getenv('API_IDENTITY')
 teams_webhook_url = os.getenv('TEAMS_WEBHOOK_URL')
 
+print(my_identity)
+print(teams_webhook_url)
+
 # retrieve tender offer filings from yesterday
 yesterday_tenders = get_yesterday_tenders(my_identity)
 
