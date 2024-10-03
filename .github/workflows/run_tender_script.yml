@@ -3,6 +3,7 @@ name: Run Tender Offer Script
 on:
   schedule:
     - cron: '0 14 * * *'  # Runs daily at 7 AM PST (14:00 UTC)
+  workflow_dispatch:   # Allows manual triggering of the workflow
 
 jobs:
   run-script:
