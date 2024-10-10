@@ -38,6 +38,21 @@ def get_yesterday_tenders(my_identity):
   new_to = tenders_df[tenders_df['filing_date']==yesterday]
   return new_to
 
+def check_odd_lot(accession_number):
+    # Download the first two attachments
+    filing = get_by_accession_number(accession_number)
+    attachment0 = filing.attachments[0].download()
+    attachment1 = filing.attachments[1].download()
+
+    # Define the regex pattern for 'odd-lot' or 'odd lot' (case-insensitive)
+    pattern = re.compile(r'\bodd[-\s]lot\b', re.IGNORECASE)
+    
+    # Check for matches in the first two attachments
+    if re.search(pattern, attachment0) or re.search(pattern, attachment1):
+        return 1
+    else:
+        return 0
+
 def send_teams_message(webhook_url, dataframe):
     # Convert the DataFrame to HTML table
     html_table = dataframe.to_html(index=False)
@@ -69,6 +84,8 @@ yesterday_tenders = get_yesterday_tenders(my_identity)
 
 # send dataframe to Teams
 if not yesterday_tenders.empty:
+    # Check if 'odd lot' is mentioned in filing attachments
+    yesterday_tenders['odd_lot'] = yesterday_tenders['accession_number'].apply(check_odd_lot)
     print('New tender offer filings found. Attempting to send email...')
     send_teams_message(teams_webhook_url, yesterday_tenders)
 else:
