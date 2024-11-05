@@ -87,6 +87,7 @@ yesterday_tenders = get_yesterday_tenders(my_identity)
 if not yesterday_tenders.empty:
     # Check if 'odd lot' is mentioned in filing attachments
     yesterday_tenders['odd_lot'] = yesterday_tenders['accession_number'].apply(check_odd_lot)
+    yesterday_tenders = yesterday_tenders[yesterday_tenders['odd_lot']==1]
     print('New tender offer filings found. Attempting to send email...')
     send_teams_message(teams_webhook_url, yesterday_tenders)
 else:
