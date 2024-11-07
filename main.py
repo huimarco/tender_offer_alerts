@@ -7,16 +7,16 @@ from edgar import *
 
 def get_tenders(my_identity):
   try:
-    # set user agent for SEC EDGAR API calls
+    # Set user agent for SEC EDGAR API calls
     set_identity(my_identity)
 
-    # retrieve filings (can specify a year; must include quarter if current year)
+    # Retrieve filings (can specify a year; must include quarter if current year)
     filings = get_filings()
 
-    # filter for tender offer related forms (including ammendments)
+    # Filter for tender offer related forms (including ammendments)
     tenders = filings.filter(form=['SC TO-I', 'SC TO-C', 'SC 13E-3', 'SC 13E-4'], amendments=True)
 
-    # return results as pandas dataframe
+    # Return results as pandas dataframe
     return tenders.to_pandas()
 
   except Exception as e:
@@ -25,10 +25,10 @@ def get_tenders(my_identity):
     return pd.DataFrame()
 
 def get_yesterday_tenders(my_identity):
-  # calculate yesterday's date
+  # Calculate yesterday's date
   yesterday = date.today() - timedelta(days=1)
 
-  # filter for tender offer forms filed yesterday and return
+  # Filter for tender offer forms filed yesterday and return
   tenders_df = get_tenders(my_identity)
 
   # Break if the filing_date is missing
@@ -76,18 +76,19 @@ def send_teams_message(webhook_url, dataframe):
 
 print('Running script on', date.today())
 
-# define variables
+# Define variables
 my_identity = os.getenv('API_IDENTITY')
 teams_webhook_url = os.getenv('TEAMS_WEBHOOK_URL')
 
-# retrieve tender offer filings from yesterday
+# Retrieve tender offer filings from yesterday
 yesterday_tenders = get_yesterday_tenders(my_identity)
+
+# Filter for those with 'odd lot' mentioned in filing attachment 
+yesterday_tenders['odd_lot'] = yesterday_tenders['accession_number'].apply(check_odd_lot)
+yesterday_tenders = yesterday_tenders[yesterday_tenders['odd_lot']==1]
 
 # send dataframe to Teams
 if not yesterday_tenders.empty:
-    # Check if 'odd lot' is mentioned in filing attachments
-    yesterday_tenders['odd_lot'] = yesterday_tenders['accession_number'].apply(check_odd_lot)
-    yesterday_tenders = yesterday_tenders[yesterday_tenders['odd_lot']==1]
     print('New tender offer filings found. Attempting to send email...')
     send_teams_message(teams_webhook_url, yesterday_tenders)
 else:
